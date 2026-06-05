@@ -1,16 +1,14 @@
 import express from 'express'
 import cors from 'cors'
-import dotenv from 'dotenv'
 import authRoutes from './routes/auth.routes'
 import complejosRoutes from './routes/complejos.routes'
 import canchasRoutes from './routes/canchas.routes'
 import reservasRoutes from './routes/reservas.routes'
 
-dotenv.config()
-
 const app = express()
 
-app.use(cors({ origin: 'http://localhost:5173' }))
+const allowedOrigin = process.env.CORS_ORIGIN ?? 'http://localhost:5173'
+app.use(cors({ origin: allowedOrigin }))
 app.use(express.json())
 
 // Log de todas las requests que llegan al BFF
@@ -32,6 +30,7 @@ const PORT = process.env.PORT ?? 3001
 
 app.listen(PORT, () => {
   console.log(`[BFF] Servidor corriendo en http://localhost:${PORT}`)
+  console.log(`[BFF] CORS habilitado para: ${allowedOrigin}`)
   console.log('[BFF] Endpoints disponibles:')
   console.log('  POST /api/auth/login')
   console.log('  POST /api/auth/signup')
