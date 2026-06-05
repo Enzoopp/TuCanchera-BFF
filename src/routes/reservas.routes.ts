@@ -6,8 +6,8 @@ const router = Router()
 
 // GET /api/reservas — mis reservas (requiere JWT)
 router.get('/', requireAuth, async (req, res) => {
-  const { user, token } = req as AuthRequest
-  console.log(`[BFF] GET /api/reservas → usuario: ${user.id}`)
+  const { profileId, token } = req as AuthRequest
+  console.log(`[BFF] GET /api/reservas → perfil: ${profileId}`)
 
   const client = supabaseForUser(token)
   const { data, error } = await client
@@ -21,7 +21,7 @@ router.get('/', requireAuth, async (req, res) => {
         complejos ( nombre, slug )
       )
     `)
-    .eq('cliente_id', user.id)
+    .eq('cliente_id', profileId)
     .order('fecha', { ascending: false })
     .order('hora_inicio', { ascending: false })
 
@@ -33,21 +33,21 @@ router.get('/', requireAuth, async (req, res) => {
 
 // POST /api/reservas — crear reserva (requiere JWT)
 router.post('/', requireAuth, async (req, res) => {
-  const { user, token } = req as AuthRequest
+  const { profileId, token } = req as AuthRequest
   const { canchaId, fecha, horaInicio, horaFin, metodoPago, precio } = req.body
-  console.log(`[BFF] POST /api/reservas → usuario: ${user.id}, cancha: ${canchaId}, fecha: ${fecha}`)
+  console.log(`[BFF] POST /api/reservas → perfil: ${profileId}, cancha: ${canchaId}, fecha: ${fecha}`)
 
   const client = supabaseForUser(token)
   const { data, error } = await client
     .from('reservas')
     .insert({
-      cancha_id: canchaId,
-      cliente_id: user.id,
+      cancha_id:   canchaId,
+      cliente_id:  profileId,
       fecha,
       hora_inicio: horaInicio,
-      hora_fin: horaFin,
+      hora_fin:    horaFin,
       metodo_pago: metodoPago,
-      estado: 'confirmada',
+      estado:      'confirmada',
       precio,
     })
     .select()
@@ -62,8 +62,8 @@ router.post('/', requireAuth, async (req, res) => {
 // POST /api/reservas/:id/cancelar — cancelar reserva (requiere JWT)
 router.post('/:id/cancelar', requireAuth, async (req, res) => {
   const { id } = req.params
-  const { user, token } = req as AuthRequest
-  console.log(`[BFF] POST /api/reservas/${id}/cancelar → usuario: ${user.id}`)
+  const { profileId, token } = req as AuthRequest
+  console.log(`[BFF] POST /api/reservas/${id}/cancelar → perfil: ${profileId}`)
 
   const client = supabaseForUser(token)
   const { data, error } = await client.rpc('cancelar_reserva_cliente', {
@@ -72,7 +72,7 @@ router.post('/:id/cancelar', requireAuth, async (req, res) => {
 
   if (error) return res.status(500).json({ error: error.message })
 
-  console.log(`[BFF] Cancelar OK → resultado: ${JSON.stringify(data)}`)
+  console.log(`[BFF] Cancelar OK → ${JSON.stringify(data)}`)
   res.json(data)
 })
 
