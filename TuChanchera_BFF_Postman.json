@@ -1,0 +1,218 @@
+{
+  "info": {
+    "name": "TuChanchera BFF",
+    "description": "Colección de los 7 endpoints del BFF de TuChanchera.\n\nFlujo recomendado:\n1. Ejecutar **Login** → el token se guarda automáticamente en la variable `token`\n2. Los endpoints protegidos usan `{{token}}` automáticamente",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:3001",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.access_token) {",
+                  "    pm.collectionVariables.set('token', json.access_token);",
+                  "    console.log('Token guardado en variable `token`');",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"pitanatiziana@gmail.com\",\n  \"password\": \"tizianapitana123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "login"]
+            },
+            "description": "Login de usuario. El token JWT se guarda automáticamente en la variable `token` para usar en los endpoints protegidos."
+          }
+        },
+        {
+          "name": "Signup",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"nuevousuario@gmail.com\",\n  \"password\": \"password123\",\n  \"nombre\": \"Nombre Apellido\",\n  \"telefono\": \"1122334455\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/signup",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "signup"]
+            },
+            "description": "Registro de nuevo cliente. Crea cuenta en Supabase Auth y perfil con rol 'cliente'."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Complejos",
+      "item": [
+        {
+          "name": "Listar complejos activos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/complejos",
+              "host": ["{{base_url}}"],
+              "path": ["api", "complejos"]
+            },
+            "description": "Devuelve todos los complejos con activo=true. No requiere autenticación."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Canchas",
+      "item": [
+        {
+          "name": "Canchas por complejo",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/canchas/:complejoId",
+              "host": ["{{base_url}}"],
+              "path": ["api", "canchas", ":complejoId"],
+              "variable": [
+                {
+                  "key": "complejoId",
+                  "value": "REEMPLAZAR_CON_ID_DE_COMPLEJO",
+                  "description": "UUID del complejo (obtenido de GET /api/complejos)"
+                }
+              ]
+            },
+            "description": "Devuelve las canchas activas de un complejo. No requiere autenticación."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Reservas (requieren JWT)",
+      "item": [
+        {
+          "name": "Mis reservas",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "description": "JWT obtenido del Login"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/reservas",
+              "host": ["{{base_url}}"],
+              "path": ["api", "reservas"]
+            },
+            "description": "Devuelve las reservas del usuario autenticado. Requiere JWT en Authorization header."
+          }
+        },
+        {
+          "name": "Crear reserva",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "description": "JWT obtenido del Login"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"canchaId\": \"REEMPLAZAR_CON_ID_DE_CANCHA\",\n  \"fecha\": \"2026-06-20\",\n  \"horaInicio\": \"10:00:00\",\n  \"horaFin\": \"11:00:00\",\n  \"metodoPago\": \"efectivo\",\n  \"precio\": 5000\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/reservas",
+              "host": ["{{base_url}}"],
+              "path": ["api", "reservas"]
+            },
+            "description": "Crea una nueva reserva para el usuario autenticado. El cliente_id se resuelve automáticamente desde el JWT."
+          }
+        },
+        {
+          "name": "Cancelar reserva",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "description": "JWT obtenido del Login"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "{{base_url}}/api/reservas/:id/cancelar",
+              "host": ["{{base_url}}"],
+              "path": ["api", "reservas", ":id", "cancelar"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "REEMPLAZAR_CON_ID_DE_RESERVA",
+                  "description": "UUID de la reserva a cancelar"
+                }
+              ]
+            },
+            "description": "Cancela una reserva del usuario autenticado. Llama al RPC cancelar_reserva_cliente en Supabase."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Health check",
+      "item": [
+        {
+          "name": "GET /health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/health",
+              "host": ["{{base_url}}"],
+              "path": ["health"]
+            },
+            "description": "Verifica que el BFF está corriendo."
+          }
+        }
+      ]
+    }
+  ]
+}
