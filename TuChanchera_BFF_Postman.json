@@ -1,7 +1,8 @@
 {
   "info": {
+    "_postman_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
     "name": "TuChanchera BFF",
-    "description": "Colección de los 7 endpoints del BFF de TuChanchera.\n\nFlujo recomendado:\n1. Ejecutar **Login** → el token se guarda automáticamente en la variable `token`\n2. Los endpoints protegidos usan `{{token}}` automáticamente",
+    "description": "Colección de los 7 endpoints del BFF de TuChanchera.\n\nFlujo recomendado:\n1. Ejecutar Auth → Login → el token se guarda automáticamente en la variable token\n2. Los endpoints de Reservas usan ese token automáticamente",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
