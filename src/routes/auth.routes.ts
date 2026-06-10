@@ -28,7 +28,7 @@ router.post('/login', asyncHandler(async (req, res) => {
 
 // POST /api/auth/signup
 router.post('/signup', asyncHandler(async (req, res) => {
-  const { email, password, nombre, telefono } = req.body
+  const { email, password, nombre, telefono, rol, emailRedirectTo } = req.body
   if (!email || !password) {
     throw new ValidationError('Faltan campos obligatorios', ['email', 'password'])
   }
@@ -37,7 +37,11 @@ router.post('/signup', asyncHandler(async (req, res) => {
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
-    options: { data: { nombre, telefono, rol: 'cliente' } },
+    options: {
+      // rol viene del front (cliente o admin); por defecto cliente
+      data: { nombre, telefono, rol: rol ?? 'cliente' },
+      ...(emailRedirectTo ? { emailRedirectTo } : {}),
+    },
   })
   if (error) throw new ValidationError(error.message)
 
