@@ -4,6 +4,7 @@ import authRoutes from './routes/auth.routes'
 import complejosRoutes from './routes/complejos.routes'
 import canchasRoutes from './routes/canchas.routes'
 import reservasRoutes from './routes/reservas.routes'
+import { errorHandler } from './middleware/error.middleware'
 
 const app = express()
 
@@ -25,6 +26,10 @@ app.use('/api/reservas', reservasRoutes)
 app.get('/health', (_req, res) => {
   res.json({ status: 'ok', service: 'TuChanchera BFF' })
 })
+
+// Middleware de errores: SIEMPRE al final de la cadena.
+// Cualquier ApiError lanzado en las rutas se resuelve acá (ver error.middleware.ts)
+app.use(errorHandler)
 
 const PORT = process.env.PORT ?? 3001
 
