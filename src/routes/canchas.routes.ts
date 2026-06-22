@@ -1,3 +1,10 @@
+// ============================================================
+// CANCHAS.ROUTES.TS — Endpoint público de canchas
+// Un solo endpoint, sin login:
+//   - GET /api/canchas/:complejoId → lista las canchas de un complejo
+// Primero valida que el complejo exista (si no, responde 404).
+// ============================================================
+
 import { Router } from 'express'
 import { supabase } from '../config/supabase'
 import { asyncHandler } from '../middleware/error.middleware'
@@ -5,7 +12,7 @@ import { InternalError, NotFoundError } from '../errors/ApiError'
 
 const router = Router()
 
-// GET /api/canchas/:complejoId
+// GET /api/canchas/:complejoId — canchas activas de un complejo
 router.get('/:complejoId', asyncHandler(async (req, res) => {
   const { complejoId } = req.params
   console.log(`[BFF] GET /api/canchas/${complejoId} → consultando Supabase`)

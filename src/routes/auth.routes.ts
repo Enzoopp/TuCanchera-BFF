@@ -1,3 +1,11 @@
+// ============================================================
+// AUTH.ROUTES.TS — Endpoints de autenticación
+// Agrupa los 2 endpoints públicos de login/registro:
+//   - POST /api/auth/login  → valida credenciales y devuelve los tokens
+//   - POST /api/auth/signup → crea una cuenta nueva
+// El BFF no guarda usuarios: delega en Supabase Auth y le pasa los datos.
+// ============================================================
+
 import { Router } from 'express'
 import { supabase } from '../config/supabase'
 import { asyncHandler } from '../middleware/error.middleware'
@@ -5,7 +13,7 @@ import { ValidationError, UnauthorizedError } from '../errors/ApiError'
 
 const router = Router()
 
-// POST /api/auth/login
+// POST /api/auth/login — inicia sesión
 router.post('/login', asyncHandler(async (req, res) => {
   const { email, password } = req.body
   if (!email || !password) {
