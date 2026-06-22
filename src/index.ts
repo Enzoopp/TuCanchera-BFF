@@ -1,3 +1,16 @@
+// ============================================================
+// INDEX.TS — Punto de entrada del BFF
+// Acá se arma el servidor Express y se "enchufan" todas las piezas:
+//   1. CORS: permite que el front (localhost:5173) le pegue al BFF
+//   2. express.json(): entiende los body en formato JSON
+//   3. Un log que imprime cada request que llega (útil para la demo)
+//   4. Se registran las rutas agrupadas por entidad (/api/auth, etc.)
+//   5. errorHandler al final: centraliza el manejo de errores
+//   6. Se levanta el servidor en el puerto 3001
+//
+// Es lo primero que corre cuando hacés `npm run dev`.
+// ============================================================
+
 import express from 'express'
 import cors from 'cors'
 import authRoutes from './routes/auth.routes'

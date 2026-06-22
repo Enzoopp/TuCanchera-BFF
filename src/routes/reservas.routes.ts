@@ -1,3 +1,15 @@
+// ============================================================
+// RESERVAS.ROUTES.TS — Endpoints de reservas (PRIVADOS)
+// Los 3 endpoints de reservas. TODOS llevan "requireAuth" adelante,
+// así que solo funcionan con un usuario logueado (token válido):
+//   - GET  /api/reservas            → las reservas del usuario
+//   - POST /api/reservas            → crear una reserva
+//   - POST /api/reservas/:id/cancelar → cancelar una reserva
+//
+// Usan supabaseForUser(token) en vez del cliente público, para que
+// la seguridad de filas (RLS) garantice que cada uno toca solo lo suyo.
+// ============================================================
+
 import { Router } from 'express'
 import { requireAuth, AuthRequest } from '../middleware/auth.middleware'
 import { supabaseForUser } from '../config/supabase'
@@ -7,6 +19,7 @@ import { InternalError, ValidationError } from '../errors/ApiError'
 const router = Router()
 
 // GET /api/reservas — mis reservas (requiere JWT)
+// El JOIN con canchas/complejos trae el detalle en una sola consulta.
 router.get('/', requireAuth, asyncHandler(async (req, res) => {
   const { profileId, token } = req as AuthRequest
   console.log(`[BFF] GET /api/reservas → perfil: ${profileId}`)
